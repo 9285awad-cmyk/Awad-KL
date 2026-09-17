@@ -1,47 +1,75 @@
-name: Build Flutter APK
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as json;
 
-on:
-  push:
-    branches: [ "main" ]
+// لتفعيل شاشة الصيانة: للتحكم في وضع الصيانة
+const bool isUnderMaintenance = false;
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+void main() {
+  runApp(const FootballApp());
+}
 
-    steps:
-      - uses: actions/checkout@v4
+class FootballApp extends StatelessWidget {
+  const FootballApp({Key? key}) : super(key: key);
 
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Awad KL',
+      debugShowCheckedModeBanner: false,
+      locale: const Locale('ar', 'SA'),
+      supportedLocales: const [Locale('ar', 'SA')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        scaffoldBackgroundColor: const Color(0xFF121212),
+      ),
+      home: isUnderMaintenance ? const MaintenanceScreen() : const HomeScreen(),
+    );
+  }
+}
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.19.0'
-          channel: 'stable'
-          cache: true
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
-      - name: Configure Flutter and Create Project
-        run: |
-          flutter config --no-analytics
-          flutter --version
-          rm -rf android ios linux macos windows web
-          flutter create . --org com.awad.kl --project-name awad_kl --force
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Awad KL - الدوري'),
+        backgroundColor: Colors.green[800],
+      ),
+      body: const Center(
+        child: Text(
+          'أهلاً بك يا عوض في تطبيقك الرياضي',
+          style: TextStyle(color: Colors.white, fontSize: 18),
+        ),
+      ),
+    );
+  }
+}
 
-      - name: Install dependencies
-        run: flutter pub get
+class MaintenanceScreen extends StatelessWidget {
+  const MaintenanceScreen({Key? key}) : super(key: key);
 
-      - name: Build APK
-        run: flutter build apk --release
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-
-
-
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Text(
+            'التطبيق تحت الصيانة حالياً، عودوا قريباً.',
+            style: TextStyle(color: Colors.yellow[700], fontSize: 20),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+}
