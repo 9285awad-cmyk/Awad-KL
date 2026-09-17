@@ -24,6 +24,11 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Force create Flutter project structure
+        run: |
+          rm -rf android ios linux macos windows web
+          flutter create . --org com.awad.kl --project-name awad_kl --force
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -35,4 +40,5 @@ jobs:
         with:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+
 
